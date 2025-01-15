@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.swu9d.mongodb.net/?retryWrites=true&w=majority`;
 
 
@@ -44,6 +44,19 @@ async function run() {
         .skip(page * size)
         .limit(size)
         .toArray();
+      res.send(result);
+    })
+
+    app.post('/productsByIds', async (req, res) => {
+      const ids = req.body;
+      const idsWithObjectsId = ids.map(id => new ObjectId(id));
+      const query = {
+        _id: {
+          $in: idsWithObjectsId
+        }
+      }
+      const result = await productCollection.find(query).toArray();
+      console.log(idsWithObjectsId);
       res.send(result);
     })
 
